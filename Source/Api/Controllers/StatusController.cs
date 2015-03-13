@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Net;
 using System.Web.Http;
+using System.Web.Http.Description;
+using Exceptionless.Api.Models;
 using Exceptionless.Core;
 using Exceptionless.Core.Authorization;
 using Exceptionless.Core.Queues.Models;
@@ -9,6 +11,7 @@ using Foundatio.Metrics;
 using Foundatio.Queues;
 
 namespace Exceptionless.Api.Controllers {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class StatusController : ExceptionlessApiController {
         private readonly SystemHealthChecker _healthChecker;
         private readonly IQueue<EventPost> _eventQueue;
@@ -29,17 +32,19 @@ namespace Exceptionless.Api.Controllers {
             _metricsClient = metricsClient;
         }
 
+        /// <summary>
+        /// Get the status of the API
+        /// </summary>
+        /// <response code="503">Contains a message detailing the service outage message.</response>
         [HttpGet]
         [Route(API_PREFIX + "/status")]
+        [ResponseType(typeof(StatusResult))]
         public IHttpActionResult Index() {
             var result = _healthChecker.CheckAll();
             if (!result.IsHealthy)
                 return StatusCodeWithMessage(HttpStatusCode.ServiceUnavailable, result.Message);
 
-            return Ok(new {
-                Message = "All Systems Check",
-                Version = Settings.Current.Version
-            });
+            return Ok(new StatusResult { Message = "All Systems Check", Version = Settings.Current.Version });
         }
 
         [HttpGet]

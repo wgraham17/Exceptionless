@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Web.Http;
+using System.Web.Http.Description;
 using Exceptionless.Api.Extensions;
 using Exceptionless.Api.Models;
 using Exceptionless.Api.Security;
@@ -27,20 +28,36 @@ namespace Exceptionless.Api.Controllers {
         private readonly IUserRepository _userRepository;
         private readonly IMailer _mailer;
         private readonly TokenManager _tokenManager;
-        private readonly DataHelper _dataHelper;
 
         private static bool _isFirstUserChecked;
 
-        public AuthController(IOrganizationRepository organizationRepository, IUserRepository userRepository, IMailer mailer, TokenManager tokenManager, DataHelper dataHelper) {
+        public AuthController(IOrganizationRepository organizationRepository, IUserRepository userRepository, IMailer mailer, TokenManager tokenManager) {
             _organizationRepository = organizationRepository;
             _userRepository = userRepository;
             _mailer = mailer;
             _tokenManager = tokenManager;
-            _dataHelper = dataHelper;
         }
 
+        /// <summary>
+        /// Login
+        /// </summary>
+        /// <remarks>
+        /// Log in with your email address and password to generate a token scoped with your users roles.
+        /// 
+        /// <code>{ "email": "noreply@exceptionless.io", "password": "exceptionless" }</code>
+        /// 
+        /// This token can then be used to access the api. You can use this token in the header (bearer authentication)
+        /// or append it onto the query string: ?access_token=MY_TOKEN
+        /// 
+        /// Please note that you can also use this token on the documentation site by placing it in the 
+        /// headers api_key input box.
+        /// </remarks>
+        /// <param name="model">The login model.</param>
+        /// <response code="400">The login model is invalid.</response>
+        /// <response code="401">Login failed.</response>
         [HttpPost]
         [Route("login")]
+        [ResponseType(typeof(TokenResult))]
         public IHttpActionResult Login(LoginModel model) {
             if (model == null || String.IsNullOrWhiteSpace(model.Email))
                 return BadRequest("Email Address is required.");
@@ -71,11 +88,18 @@ namespace Exceptionless.Api.Controllers {
 				AddInvitedUserToOrganization(model.InviteToken, user);
 
             //_exceptionless.CreateFeatureUsage("Login").AddObject(user).Submit();
-            return Ok(new { Token = GetToken(user) });
+            return Ok(new TokenResult { Token = GetToken(user) });
         }
 
+        /// <summary>
+        /// Signup
+        /// </summary>
+        /// <param name="model">The signup model.</param>
+        /// <response code="400">The signup model is invalid.</response>
+        /// <response code="401">Signup failed.</response>
         [HttpPost]
         [Route("signup")]
+        [ResponseType(typeof(TokenResult))]
         public IHttpActionResult Signup(SignupModel model) {
             if (!Settings.Current.EnableAccountCreation) 
                 return BadRequest("Account Creation is currently disabled.");
@@ -132,12 +156,14 @@ namespace Exceptionless.Api.Controllers {
                 _mailer.SendVerifyEmail(user);
 
             //_exceptionless.CreateFeatureUsage("Signup").AddObject(user).Submit();
-            return Ok(new { Token = GetToken(user) });
+            return Ok(new TokenResult { Token = GetToken(user) });
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         [Route("github")]
-        public IHttpActionResult Github(JObject value) {
+        [ResponseType(typeof(TokenResult))]
+        public IHttpActionResult GitHub(JObject value) {
             var authInfo = value.ToObject<ExternalAuthInfo>();
             if (authInfo == null || String.IsNullOrEmpty(authInfo.Code))
                 return NotFound();
@@ -179,11 +205,13 @@ namespace Exceptionless.Api.Controllers {
             if (!String.IsNullOrWhiteSpace(authInfo.InviteToken))
                 AddInvitedUserToOrganization(authInfo.InviteToken, user);
 
-            return Ok(new { Token = GetToken(user) });
+            return Ok(new TokenResult { Token = GetToken(user) });
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         [Route("google")]
+        [ResponseType(typeof(TokenResult))]
         public IHttpActionResult Google(JObject value) {
             var authInfo = value.ToObject<ExternalAuthInfo>();
             if (authInfo == null || String.IsNullOrEmpty(authInfo.Code))
@@ -226,11 +254,13 @@ namespace Exceptionless.Api.Controllers {
             if (!String.IsNullOrWhiteSpace(authInfo.InviteToken))
                 AddInvitedUserToOrganization(authInfo.InviteToken, user);
 
-            return Ok(new { Token = GetToken(user) });
+            return Ok(new TokenResult { Token = GetToken(user) });
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         [Route("facebook")]
+        [ResponseType(typeof(TokenResult))]
         public IHttpActionResult Facebook(JObject value) {
             var authInfo = value.ToObject<ExternalAuthInfo>();
             if (authInfo == null || String.IsNullOrEmpty(authInfo.Code))
@@ -273,11 +303,13 @@ namespace Exceptionless.Api.Controllers {
             if (!String.IsNullOrWhiteSpace(authInfo.InviteToken))
                 AddInvitedUserToOrganization(authInfo.InviteToken, user);
 
-            return Ok(new { Token = GetToken(user) });
+            return Ok(new TokenResult { Token = GetToken(user) });
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         [Route("live")]
+        [ResponseType(typeof(TokenResult))]
         public IHttpActionResult Live(JObject value) {
             var authInfo = value.ToObject<ExternalAuthInfo>();
             if (authInfo == null || String.IsNullOrEmpty(authInfo.Code))
@@ -320,9 +352,10 @@ namespace Exceptionless.Api.Controllers {
             if (!String.IsNullOrWhiteSpace(authInfo.InviteToken))
                 AddInvitedUserToOrganization(authInfo.InviteToken, user);
 
-            return Ok(new { Token = GetToken(user) });
+            return Ok(new TokenResult { Token = GetToken(user) });
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         [Route("unlink/{providerName:minlength(1)}")]
         [Authorize(Roles = AuthorizationRoles.User)]
@@ -340,6 +373,11 @@ namespace Exceptionless.Api.Controllers {
             return Ok();
         }
 
+        /// <summary>
+        /// Change password
+        /// </summary>
+        /// <param name="model">The change password model.</param>
+        /// <response code="400">Invalid change password model.</response>
         [HttpPost]
         [Route("change-password")]
         [Authorize(Roles = AuthorizationRoles.User)]
@@ -363,6 +401,7 @@ namespace Exceptionless.Api.Controllers {
             return Ok();
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         [Route("check-email-address/{email:minlength(1)}")]
         public IHttpActionResult IsEmailAddressAvailable(string email) {
@@ -378,6 +417,11 @@ namespace Exceptionless.Api.Controllers {
             return StatusCode(HttpStatusCode.Created);
         }
 
+        /// <summary>
+        /// Forgot password
+        /// </summary>
+        /// <param name="email">The email address.</param>
+        /// <response code="400">Invalid email address.</response>
         [HttpGet]
         [Route("forgot-password/{email:minlength(1)}")]
         public IHttpActionResult ForgotPassword(string email) {
@@ -388,8 +432,7 @@ namespace Exceptionless.Api.Controllers {
             if (user == null)
                 return BadRequest("No user was found with this Email Address.");
 
-            user.PasswordResetToken = Core.Extensions.StringExtensions.GetNewToken();
-            user.PasswordResetTokenExpiration = DateTime.Now.AddMinutes(1440);
+            user.CreatePasswordResetToken();
             _userRepository.Save(user);
 
             _mailer.SendPasswordReset(user);
@@ -398,6 +441,11 @@ namespace Exceptionless.Api.Controllers {
             return Ok();
         }
 
+        /// <summary>
+        /// Reset password
+        /// </summary>
+        /// <param name="model">The reset password model.</param>
+        /// <response code="400">Invalid reset password model.</response>
         [HttpPost]
         [Route("reset-password")]
         public IHttpActionResult ResetPassword(ResetPasswordModel model) {
@@ -408,7 +456,7 @@ namespace Exceptionless.Api.Controllers {
             if (user == null)
                 return BadRequest("Invalid Password Reset Token.");
 
-            if (!user.HasValidEmailAddressTokenExpiration())
+            if (!user.HasValidPasswordResetTokenExpiration())
                 return BadRequest("Verify Email Address Token has expired.");
 
             if (!IsValidPassword(model.Password))
@@ -421,11 +469,16 @@ namespace Exceptionless.Api.Controllers {
             return Ok();
         }
 
+        /// <summary>
+        /// Cancel reset password
+        /// </summary>
+        /// <param name="token">The password reset token.</param>
+        /// <response code="400">Invalid password reset token.</response>
         [HttpPost]
         [Route("cancel-reset-password/{token:minlength(1)}")]
         public IHttpActionResult CancelResetPassword(string token) {
             if (String.IsNullOrEmpty(token))
-                return BadRequest("Invalid Password Reset Token.");
+                return BadRequest("Invalid password reset token.");
 
             var user = _userRepository.GetByPasswordResetToken(token);
             if (user == null)

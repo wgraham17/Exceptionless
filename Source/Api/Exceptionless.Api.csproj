@@ -26,6 +26,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\</OutputPath>
+    <DocumentationFile>bin\Exceptionless.Api.xml</DocumentationFile>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -34,6 +35,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\</OutputPath>
+    <DocumentationFile>bin\Exceptionless.Api.xml</DocumentationFile>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -63,7 +65,7 @@
     </Reference>
     <Reference Include="Foundatio, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Foundatio.1.0.140\lib\net45\Foundatio.dll</HintPath>
+      <HintPath>..\..\packages\Foundatio.1.0.142\lib\net45\Foundatio.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -124,25 +126,25 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\RestSharp.104.0\lib\net4\RestSharp.dll</HintPath>
     </Reference>
-    <Reference Include="SimpleInjector">
-      <HintPath>..\..\packages\SimpleInjector.2.7.2\lib\net45\SimpleInjector.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="SimpleInjector.Diagnostics, Version=2.7.2.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+    <Reference Include="SimpleInjector, Version=2.7.3.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\SimpleInjector.2.7.2\lib\net45\SimpleInjector.Diagnostics.dll</HintPath>
+      <HintPath>..\..\packages\SimpleInjector.2.7.3\lib\net45\SimpleInjector.dll</HintPath>
+    </Reference>
+    <Reference Include="SimpleInjector.Diagnostics, Version=2.7.3.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\SimpleInjector.2.7.3\lib\net45\SimpleInjector.Diagnostics.dll</HintPath>
     </Reference>
     <Reference Include="SimpleInjector.Extensions.ExecutionContextScoping, Version=2.4.0.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\SimpleInjector.Extensions.ExecutionContextScoping.2.7.2\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.dll</HintPath>
+      <HintPath>..\..\packages\SimpleInjector.Extensions.ExecutionContextScoping.2.7.3\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.dll</HintPath>
     </Reference>
-    <Reference Include="SimpleInjector.Integration.WebApi, Version=2.7.2.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+    <Reference Include="SimpleInjector.Integration.WebApi, Version=2.7.3.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\SimpleInjector.Integration.WebApi.2.7.2\lib\net45\SimpleInjector.Integration.WebApi.dll</HintPath>
+      <HintPath>..\..\packages\SimpleInjector.Integration.WebApi.2.7.3\lib\net45\SimpleInjector.Integration.WebApi.dll</HintPath>
     </Reference>
-    <Reference Include="SimpleInjector.Packaging, Version=2.7.2.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+    <Reference Include="SimpleInjector.Packaging, Version=2.7.3.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\SimpleInjector.Packaging.2.7.2\lib\net40-client\SimpleInjector.Packaging.dll</HintPath>
+      <HintPath>..\..\packages\SimpleInjector.Packaging.2.7.3\lib\net40-client\SimpleInjector.Packaging.dll</HintPath>
     </Reference>
     <Reference Include="StackExchange.Redis.StrongName, Version=1.0.316.0, Culture=neutral, PublicKeyToken=c219ff1ca8c2ce46, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -151,6 +153,10 @@
     <Reference Include="Stripe.net, Version=2.7.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Stripe.net.2.7.2\lib\net40\Stripe.net.dll</HintPath>
+    </Reference>
+    <Reference Include="Swashbuckle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cd1bb07a5ac7c7bc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Swashbuckle.Core.5.0.4\lib\net40\Swashbuckle.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -177,6 +183,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Content\docs.js" />
+    <EmbeddedResource Include="Content\docs.css" />
+    <EmbeddedResource Include="Content\logo.png" />
     <Content Include="exceptionless.png" />
     <Content Include="favicon.ico" />
     <Content Include="index.html" />
@@ -226,17 +235,21 @@
     <Compile Include="Models\Auth\LoginModel.cs" />
     <Compile Include="Models\Auth\ResetPasswordModel.cs" />
     <Compile Include="Models\Auth\SignupModel.cs" />
+    <Compile Include="Models\Auth\StatusResult.cs" />
     <Compile Include="Models\Event\UpdateEvent.cs" />
     <Compile Include="Models\Organization\Invoice.cs" />
     <Compile Include="Models\Organization\InvoiceGridModel.cs" />
     <Compile Include="Models\Organization\InvoiceLineItem.cs" />
+    <Compile Include="Models\Organization\ChangePlanResult.cs" />
     <Compile Include="Models\Organization\NewOrganization.cs" />
     <Compile Include="Models\Organization\ViewOrganization.cs" />
     <Compile Include="Models\Project\NewProject.cs" />
     <Compile Include="Models\Project\UpdateProject.cs" />
     <Compile Include="Models\Project\ViewProject.cs" />
+    <Compile Include="Models\Status\StatusResult.cs" />
     <Compile Include="Models\Token\NewToken.cs" />
     <Compile Include="Models\Token\ViewToken.cs" />
+    <Compile Include="Models\User\ChangePlanResult.cs" />
     <Compile Include="Models\User\UpdateUser.cs" />
     <Compile Include="Models\User\ViewCurrentUser.cs" />
     <Compile Include="Models\User\ViewUser.cs" />
@@ -251,7 +264,6 @@
     <Compile Include="Serialization\ExceptionlessJsonMediaTypeFormatter.cs" />
     <Compile Include="Serialization\SignalRContractResolver.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="Utility\CommaDelimitedArrayParameterBinding.cs" />
     <Compile Include="Utility\ConfigurationResponseFilterAttribute.cs" />
     <Compile Include="Utility\Delta\Delta.cs" />
     <Compile Include="Utility\Delta\NonValidatingParameterBindingAttribute.cs" />
@@ -260,6 +272,7 @@
     <Compile Include="Utility\ExceptionlessHeaders.cs" />
     <Compile Include="Utility\ExceptionlessReferenceIdExceptionHandler.cs" />
     <Compile Include="Utility\ExceptionLoggerContext.cs" />
+    <Compile Include="Utility\FilterRoutesDocumentFilter.cs" />
     <Compile Include="Utility\LowercaseHttpRoute.cs" />
     <Compile Include="Utility\NakedParameterBinding.cs" />
     <Compile Include="Utility\ObjectIdRouteConstraint.cs" />
